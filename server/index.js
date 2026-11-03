@@ -7,6 +7,8 @@ import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
 const dbPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'tienda.db');
 const db = new DatabaseSync(dbPath);
+const projectDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const distDir = path.join(projectDir, 'dist');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (
@@ -209,4 +211,15 @@ app.delete('/api/cart/:cartId/items/:productId', validCart, (req, res) => {
   res.json(cartItems(req.params.cartId));
 });
 
-app.listen(3001, () => console.log('API en http://localhost:3001'));
+app.use(express.static(distDir));
+app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api/')) return next();
+  const indexFile = path.join(distDir, 'index.html');
+  if (!existsSync(indexFile)) return next();
+  res.sendFile(indexFile, (err) => {
+    if (err) next(err);
+  });
+});
+
+const port = Number(process.env.PORT) || 3001;
+app.listen(port, () => console.log(`Servidor en http://localhost:${port}`));
