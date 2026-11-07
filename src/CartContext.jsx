@@ -15,23 +15,62 @@ function getCartId() {
 export function CartProvider({ children }) {
   const [cartId] = useState(getCartId);
   const [items, setItems] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    api.cart(cartId).then(setItems).catch(() => {});
+    api.cart(cartId)
+      .then((items) => {
+        setItems(items);
+        setError(null);
+      })
+      .catch(() => setItems([]));
   }, [cartId]);
 
-  const addToCart = useCallback(async (productId, qty = 1) => setItems(await api.addToCart(cartId, productId, qty)), [cartId]);
-  const setQuantity = useCallback(async (productId, qty) => setItems(await api.setQuantity(cartId, productId, qty)), [cartId]);
-  const remove = useCallback(async (productId) => setItems(await api.remove(cartId, productId)), [cartId]);
+  const addToCart = useCallback(async (productId, qty = 1) => {
+    try {
+      const items = await api.addToCart(cartId, productId, qty);
+      setItems(items);
+      setError(null);
+      return items;
+    } catch (e) {
+      setError(e.message);
+      throw e;
+    }
+  }, [cartId]);
+
+  const setQuantity = useCallback(async (productId, qty) => {
+    try {
+      const items = await api.setQuantity(cartId, productId, qty);
+      setItems(items);
+      setError(null);
+      return items;
+    } catch (e) {
+      setError(e.message);
+      throw e;
+    }
+  }, [cartId]);
+
+  const remove = useCallback(async (productId) => {
+    try {
+      const items = await api.remove(cartId, productId);
+      setItems(items);
+      setError(null);
+      return items;
+    } catch (e) {
+      setError(e.message);
+      throw e;
+    }
+  }, [cartId]);
 
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const total = items.reduce((s, i) => s + i.quantity * i.price, 0);
 
   return (
-    <CartContext.Provider value={{ items, count, total, addToCart, setQuantity, remove }}>
+    <CartContext.Provider value={{ items, count, total, addToCart, setQuantity, remove, error }}>
       {children}
     </CartContext.Provider>
   );
 }
 
 export const useCart = () => useContext(CartContext);
+

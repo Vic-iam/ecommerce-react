@@ -43,7 +43,6 @@ db.exec(`
   );
 `);
 
-// Precios en centavos de USD. La imagen se resuelve al leer (ver withImage).
 const seed = [
   ['Harina P.A.N. 1 kg', 'Despensa', 250, 'La harina de maíz precocida para arepas, empanadas y hallacas. Un clásico en toda mesa venezolana.', 100],
   ['Café Arauca 200 g', 'Despensa', 600, 'Café tostado y molido gourmet de Venezuela, de sabor intenso y aroma inconfundible.', 60],
@@ -138,7 +137,6 @@ const placeholder = (name) =>
     `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450"><rect width="600" height="450" fill="#e5e7eb"/><text x="300" y="235" font-family="sans-serif" font-size="30" fill="#6b7280" text-anchor="middle">${escapeXml(name)}</text></svg>`
   );
 
-// Usa public/images/<slug-del-nombre>.<ext> si existe; si no, un cuadro gris con el nombre
 const withImage = (p) => {
   if (!p) return p;
   const slug = slugify(p.name);
@@ -173,7 +171,6 @@ const validCart = (req, res, next) => {
 
 app.get('/api/cart/:cartId', validCart, (req, res) => res.json(cartItems(req.params.cartId)));
 
-// Fija la cantidad de un producto en el carrito (0 lo elimina), validando stock
 const setQuantity = (cartId, productId, quantity) => {
   const product = getProduct(productId);
   if (!product) return { status: 404, error: 'Producto no encontrado' };

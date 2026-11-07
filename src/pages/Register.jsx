@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 
-// Solo maquetado: no envía datos a ningún lado
 export default function Register() {
   return (
     <form className="form" onSubmit={(e) => e.preventDefault()}>
@@ -14,3 +13,4 @@ export default function Register() {
     </form>
   );
 }
+

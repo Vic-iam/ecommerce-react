@@ -1,4 +1,3 @@
-// Los precios se guardan en centavos de USD
 export const formatPrice = (cents) =>
   new Intl.NumberFormat('es-VE', { style: 'currency', currency: 'USD' }).format(cents / 100);
 
